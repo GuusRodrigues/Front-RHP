@@ -1,2 +1,2 @@
 # PI-Mobile
-APP do Sistema de Gerenciamento escolar para o ensino médio técnico do SENAC PE
+Sistema de contigência hospitalar para o Real Hospital Português do Recife para projeto de redidência tecnológica do Embarque digital.

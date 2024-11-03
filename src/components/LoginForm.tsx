@@ -1,13 +1,17 @@
 import { useState, ChangeEvent, FormEvent } from 'react';
+import { useRouter } from 'next/router'; // Importando useRouter do Next.js
 import { FaUser, FaLock } from "react-icons/fa";
 
 const LoginForm: React.FC = () => {
   const [username, setUsername] = useState<string>('');
   const [password, setPassword] = useState<string>('');
+  const router = useRouter(); // Inicializa o useRouter
 
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
-    // Adicione sua lógica de envio do formulário aqui
+    // Adicione sua lógica de autenticação aqui
+    // Se a autenticação for bem-sucedida, redirecione
+    router.push('/SistemaContigencia'); // Redireciona para a página SistemaContigencia
   };
 
   const handleUsernameChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -25,7 +29,7 @@ const LoginForm: React.FC = () => {
         <div className="input-group">
           <p>LOGIN</p>
           <div className="input-with-icon">
-          <FaUser className="icon" />
+            <FaUser className="icon" />
             <input
               type="email"
               placeholder="Digite seu login"
@@ -38,7 +42,7 @@ const LoginForm: React.FC = () => {
         <div className="input-group">
           <p>SENHA</p>
           <div className="input-with-icon">
-          <FaLock className="icon" />
+            <FaLock className="icon" />
             <input
               type="password"
               placeholder="Digite sua senha"

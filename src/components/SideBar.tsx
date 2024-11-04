@@ -1,26 +1,33 @@
+// Sidebar.tsx
 import React from 'react';
 
-function Sidebar() {
+type ViewType = 'consulta' | 'cadastro' | 'alta' | 'transferencia' | 'configuracao' | 'sair';
+
+interface SidebarProps {
+  onSelect: (view: ViewType) => void;
+}
+
+const Sidebar: React.FC<SidebarProps> = ({ onSelect }) => {
   return (
     <div className="sidebar">
       <div className="sidebar-section">
         <h3>Gestão do Paciente</h3>
         <ul>
-          <li>Consulta de Paciente</li>
-          <li>Cadastro de Paciente</li>
-          <li>Alta Hospitalar</li>
-          <li>Transferência de Leito</li>
+          <li onClick={() => onSelect('consulta')}>Consulta de Paciente</li>
+          <li onClick={() => onSelect('cadastro')}>Cadastro de Paciente</li>
+          <li onClick={() => onSelect('alta')}>Alta Hospitalar</li>
+          <li onClick={() => onSelect('transferencia')}>Transferência de Leito</li>
         </ul>
       </div>
       <div className="sidebar-section">
         <h3>Outros</h3>
         <ul>
-          <li>Configuração</li>
-          <li style={{ color: 'red' }}>Sair</li>
+          <li onClick={() => onSelect('configuracao')}>Configuração</li>
+          <li style={{ color: 'red' }} onClick={() => onSelect('sair')}>Sair</li>
         </ul>
       </div>
     </div>
   );
-}
+};
 
 export default Sidebar;

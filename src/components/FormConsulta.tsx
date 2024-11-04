@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 
-function MainContent() {
-  const [cpf, setCpf] = useState('');
+const FormConsulta: React.FC = () => {
+  const [cpf, setCpf] = useState<string>('');
 
   const handleConsultar = () => {
     alert(`Consultando CPF: ${cpf}`);
@@ -24,6 +24,6 @@ function MainContent() {
       </div>
     </div>
   );
-}
+};
 
-export default MainContent;
+export default FormConsulta;

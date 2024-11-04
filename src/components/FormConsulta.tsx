@@ -9,7 +9,7 @@ const FormConsulta: React.FC = () => {
 
   return (
     <div className="main-content">
-      <div className="consulta-card">
+      <div className="form-card">
         <h3>Consulta de Paciente</h3>
         <div className="form-group">
           <label>CPF</label>

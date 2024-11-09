@@ -25,7 +25,10 @@ const LoginForm: React.FC = () => {
   return (
     <div className="container">
       <form onSubmit={handleSubmit} className="login-form">
-        <img className="LogoForm" src="/LogoRHP.png" alt="Logo RHP" width={300} height={200} />
+      <div className="flex justify-center items-center">
+  <img className="Transparente_13" src="/Transparente_13.png" alt="Transparente 13" width={240} height={240} 
+  />
+</div>
         <div className="input-group">
           <p>LOGIN</p>
           <div className="input-with-icon">

@@ -28,10 +28,12 @@ const Home: React.FC = () => {
 
   return (
     <main>
+      <div className='BackgroundTotal'>
       <NavBar />
       <div className="AjusteSideBar">
         <Sidebar onSelect={setView} />
         {renderView()}
+      </div>
       </div>
     </main>
   );

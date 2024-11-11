@@ -6,6 +6,10 @@
  background-color: #006035;
 }
 
+.BackgroundTotal {
+  background-color: #ffffff;
+}
+
 /*NavBAr*/
 .header {
     background-color: #ffffff; 
@@ -113,15 +117,16 @@ button[type="submit"]:hover {
 }
 
 .form-card {
-  background-color: #fff;
+  background-color: #F5F5F5;
   width: 550px;
   text-align: center;
   border-radius: 10px;
-  
+  box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.15);
+
 }
 
 .form-card h3 {
-  background-color: #999;
+  background-color: #006035;
   color: #fff;
   padding: px;
   border-radius: 8px 8px 0 0;
@@ -156,7 +161,7 @@ button[type="submit"]:hover {
 }
 
 button {
-  background-color: #999;
+  background-color: #006035;
   color: #ffffff;
   border: none;
   padding: 4px 20px;
@@ -166,14 +171,13 @@ button {
 }
 
 button:hover {
-  background-color: #999;
+  background-color: #02b363;
 }
 
 .AjusteSideBar {
-  display: flex; /* Habilita o Flexbox */
-  flex-direction: row; /* Alinha os itens na horizontal */
+  display: flex; 
+  flex-direction: row; 
 }
-
 
 .sidebar {
     width: 270px;

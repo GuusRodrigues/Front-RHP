@@ -3,8 +3,8 @@ import axios from 'axios';
 
 const FormCadastroPaciente: React.FC = () => {
   const [codigoProntuario, setCodigoProntuario] = useState<string>('');
-  const [nome, setNome] = useState<string>('');
-  const [dataNascimento, setDataNascimento] = useState<string>('');
+  const [name, setNome] = useState<string>('');
+  const [dob, setDataNascimento] = useState<string>('');
   const [sexo, setSexo] = useState<string>('');
   const [cpf, setCpf] = useState<string>('');
   const [nomeMae, setNomeMae] = useState<string>('');
@@ -18,8 +18,8 @@ const FormCadastroPaciente: React.FC = () => {
 
     const novoPaciente = {
       codigoProntuario,
-      nome,
-      dataNascimento,
+      name,
+      dob,
       sexo,
       cpf,
       nomeMae,
@@ -28,7 +28,7 @@ const FormCadastroPaciente: React.FC = () => {
 
     try {
       // Fazendo a requisição POST para a API
-      const response = await axios.post('/api/cadastrar-paciente', novoPaciente);
+      const response = await axios.post('http://localhost:3000/patients', novoPaciente);
 
       // Verificando se a resposta foi bem-sucedida
       if (response.status === 200) {
@@ -65,7 +65,7 @@ const FormCadastroPaciente: React.FC = () => {
           <input
             type="text"
             placeholder="Digite o nome do paciente"
-            value={nome}
+            value={name}
             onChange={(e) => setNome(e.target.value)}
             required
           />
@@ -75,7 +75,7 @@ const FormCadastroPaciente: React.FC = () => {
           <label>Data de Nascimento</label>
           <input
             type="date"
-            value={dataNascimento}
+            value={dob}
             onChange={(e) => setDataNascimento(e.target.value)}
             required
           />

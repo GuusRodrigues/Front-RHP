@@ -16,12 +16,13 @@ const LoginForm: React.FC = () => {
 
     try {
       // Faça a requisição para a API de login
-      const response = await axios.post('/api/login', {
+      const response = await axios.post('http://localhost:3000/login', {
         username,
         password,
       });
 
       if (response.status === 200) {
+        alert(`Login bem-sucedido! Token: ${response.data.token}`);
         // Supondo que a API retorna um token ou uma confirmação de sucesso
         console.log("Login bem-sucedido:", response.data);
 
@@ -71,7 +72,7 @@ const LoginForm: React.FC = () => {
           <div className="input-with-icon">
             <FaUser className="icon" />
             <input
-              type="email"
+              //type="email"
               placeholder="Digite seu login"
               value={username}
               onChange={handleUsernameChange}

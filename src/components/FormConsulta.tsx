@@ -2,8 +2,8 @@ import React, { useState } from 'react';
 import axios, { AxiosError } from 'axios';
 
 interface DadosPaciente {
-  nome: string;
-  dataNascimento: string;
+  name: string;
+  dob: string;
   sexo: string;
   // Adicione outros campos conforme o retorno da sua API
 }
@@ -24,7 +24,7 @@ const FormConsulta: React.FC = () => {
 
     try {
       // Fazendo a requisição para a API com o CPF fornecido
-      const response = await axios.get(`/api/consultar-paciente/${cpf}`);
+      const response = await axios.get(`http://localhost:3000/patients/${cpf}`);
 
       // Verificando se a resposta foi bem-sucedida
       if (response.status === 200) {
@@ -71,8 +71,8 @@ const FormConsulta: React.FC = () => {
         {dadosPaciente && (
           <div className="dados-paciente">
             <h4>Dados do Paciente:</h4>
-            <p><strong>Nome:</strong> {dadosPaciente.nome}</p>
-            <p><strong>Data de Nascimento:</strong> {dadosPaciente.dataNascimento}</p>
+            <p><strong>Nome:</strong> {dadosPaciente.name}</p>
+            <p><strong>Data de Nascimento:</strong> {dadosPaciente.dob}</p>
             <p><strong>Sexo:</strong> {dadosPaciente.sexo}</p>
             {/* Adicione mais campos conforme a estrutura dos dados */}
           </div>

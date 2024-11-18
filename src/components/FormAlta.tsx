@@ -35,7 +35,7 @@ const FormAlta: React.FC = () => {
 
     try {
       // Fazendo a requisição POST para a API
-      const response = await axios.post('/api/alta-paciente', altaData);
+      const response = await axios.patch(`http://localhost:3000/patients/${cpf}/alta`, altaData);
 
       // Verificando a resposta
       if (response.status === 200) {

@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import axios from 'axios';
 
 const FormTransferencia: React.FC = () => {
   const [cpf, setCpf] = useState<string>('');
@@ -7,6 +8,7 @@ const FormTransferencia: React.FC = () => {
   const [codigoLeitoDestino, setCodigoLeitoDestino] = useState<string>('');
   const [dataTransferencia, setDataTransferencia] = useState<string>('');
   const [horaTransferencia, setHoraTransferencia] = useState<string>('');
+  const [mensagem, setMensagem] = useState<string | null>(null);
 
   useEffect(() => {
     const now = new Date();
@@ -17,9 +19,36 @@ const FormTransferencia: React.FC = () => {
     setHoraTransferencia(time);
   }, []);
 
-  const handleTransferencia = () => {
-    alert(`Transferindo paciente com CPF: ${cpf}`);
-    // Lógica para processar a transferência de leito
+  const handleTransferencia = async () => {
+    setMensagem(null); // Resetando mensagens de erro/sucesso
+
+    const payload = {
+      cpf,
+      codigoLeitoAtual,
+      codigoUnidade,
+      codigoLeitoDestino,
+      dataTransferencia,
+      horaTransferencia,
+    };
+
+    try {
+      const response = await axios.post('/api/transferencia', payload);
+
+      if (response.status === 200) {
+        setMensagem('Transferência realizada com sucesso!');
+      } else {
+        setMensagem('Ocorreu um problema ao realizar a transferência.');
+      }
+    } catch (error) {
+      if (axios.isAxiosError(error)) {
+        // Erro gerado pelo Axios
+        setMensagem(error.response?.data?.message || 'Erro ao fazer a transferência.');
+      } else {
+        // Erro genérico que não é do Axios
+        setMensagem('Erro ao conectar com o servidor.');
+      }
+      console.error('Erro na transferência:', error);
+    }
   };
 
   return (
@@ -90,6 +119,8 @@ const FormTransferencia: React.FC = () => {
             readOnly
           />
         </div>
+
+        {mensagem && <p className="mensagem">{mensagem}</p>} {/* Exibe mensagens */}
 
         <button onClick={handleTransferencia}>Confirmar Transferência</button>
       </div>

@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import axios from 'axios';
 
 const FormAlta: React.FC = () => {
   const [cpf, setCpf] = useState<string>('');
@@ -6,7 +7,10 @@ const FormAlta: React.FC = () => {
   const [horaAlta, setHoraAlta] = useState<string>('');
   const [motivoAlta, setMotivoAlta] = useState<string>('');
   const [motivoOutro, setMotivoOutro] = useState<string>('');
+  const [mensagem, setMensagem] = useState<string | null>(null);
+  const [loading, setLoading] = useState<boolean>(false);
 
+  // Definindo data e hora da alta ao carregar a tela
   useEffect(() => {
     const now = new Date();
     const date = now.toISOString().split('T')[0]; // Formato de data "YYYY-MM-DD"
@@ -16,9 +20,35 @@ const FormAlta: React.FC = () => {
     setHoraAlta(time);
   }, []);
 
-  const handleAlta = () => {
-    alert(`Realizando alta do paciente com CPF: ${cpf}`);
-    // Lógica para enviar os dados da alta
+  // Função para tratar a confirmação da alta
+  const handleAlta = async () => {
+    setMensagem(null); // Resetando a mensagem
+    setLoading(true); // Iniciando o estado de loading
+
+    const altaData = {
+      cpf,
+      dataAlta,
+      horaAlta,
+      motivoAlta,
+      motivoOutro: motivoAlta === 'outros' ? motivoOutro : '', // Só enviar motivoOutro se 'outros' for selecionado
+    };
+
+    try {
+      // Fazendo a requisição POST para a API
+      const response = await axios.post('/api/alta-paciente', altaData);
+
+      // Verificando a resposta
+      if (response.status === 200) {
+        setMensagem('Alta confirmada com sucesso!');
+      } else {
+        setMensagem('Ocorreu um erro ao confirmar a alta.');
+      }
+    } catch (error) {
+      console.error('Erro ao confirmar alta:', error);
+      setMensagem('Erro ao conectar com a API. Tente novamente mais tarde.');
+    } finally {
+      setLoading(false); // Finalizando o estado de loading
+    }
   };
 
   return (
@@ -87,7 +117,13 @@ const FormAlta: React.FC = () => {
           </div>
         )}
 
-        <button onClick={handleAlta}>Confirmar Alta</button>
+        {/* Exibindo a mensagem de erro ou sucesso */}
+        {mensagem && <p className="mensagem">{mensagem}</p>}
+
+        {/* Botão para confirmar alta */}
+        <button onClick={handleAlta} disabled={loading}>
+          {loading ? 'Confirmando...' : 'Confirmar Alta'}
+        </button>
       </div>
     </div>
   );

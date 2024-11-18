@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import axios from 'axios';
 
 const FormCadastroPaciente: React.FC = () => {
   const [codigoProntuario, setCodigoProntuario] = useState<string>('');
@@ -8,17 +9,46 @@ const FormCadastroPaciente: React.FC = () => {
   const [cpf, setCpf] = useState<string>('');
   const [nomeMae, setNomeMae] = useState<string>('');
   const [nomePai, setNomePai] = useState<string>('');
+  const [mensagem, setMensagem] = useState<string | null>(null);
+  const [loading, setLoading] = useState<boolean>(false);
 
-  const handleCadastrar = () => {
-    alert(`Cadastrando paciente: ${nome}`);
-    // Aqui, você pode adicionar lógica para envio dos dados para o backend
+  const handleCadastrar = async () => {
+    setMensagem(null); // Resetando mensagem
+    setLoading(true); // Indicando que a requisição está em andamento
+
+    const novoPaciente = {
+      codigoProntuario,
+      nome,
+      dataNascimento,
+      sexo,
+      cpf,
+      nomeMae,
+      nomePai,
+    };
+
+    try {
+      // Fazendo a requisição POST para a API
+      const response = await axios.post('/api/cadastrar-paciente', novoPaciente);
+
+      // Verificando se a resposta foi bem-sucedida
+      if (response.status === 200) {
+        setMensagem('Paciente cadastrado com sucesso!');
+      } else {
+        setMensagem('Ocorreu um erro ao cadastrar o paciente.');
+      }
+    } catch (error) {
+      console.error('Erro ao cadastrar paciente:', error);
+      setMensagem('Erro ao conectar com a API. Tente novamente mais tarde.');
+    } finally {
+      setLoading(false); // Finalizando o estado de carregamento
+    }
   };
 
   return (
     <div className="main-content">
       <div className="form-card">
         <h3>Cadastro de Paciente</h3>
-        
+
         <div className="form-group">
           <label>Código do Prontuário</label>
           <input
@@ -97,7 +127,13 @@ const FormCadastroPaciente: React.FC = () => {
           />
         </div>
 
-        <button onClick={handleCadastrar}>Cadastrar</button>
+        {/* Exibindo mensagem de erro ou sucesso */}
+        {mensagem && <p className="mensagem">{mensagem}</p>}
+
+        {/* Botão de cadastro */}
+        <button onClick={handleCadastrar} disabled={loading}>
+          {loading ? 'Cadastrando...' : 'Cadastrar'}
+        </button>
       </div>
     </div>
   );

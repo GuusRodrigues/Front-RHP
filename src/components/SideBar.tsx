@@ -15,8 +15,8 @@ const Sidebar: React.FC<SidebarProps> = ({ onSelect }) => {
         <ul>
           <li onClick={() => onSelect('consulta')}>Consulta de Paciente</li>
           <li onClick={() => onSelect('cadastro')}>Cadastro de Paciente</li>
-          <li onClick={() => onSelect('alta')}>Alta Hospitalar</li>
           <li onClick={() => onSelect('transferencia')}>Transferência de Leito</li>
+          <li onClick={() => onSelect('alta')}>Alta Hospitalar</li>
         </ul>
       </div>
       <div className="sidebar-section">

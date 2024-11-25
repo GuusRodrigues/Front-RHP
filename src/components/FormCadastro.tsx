@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import axios from 'axios';
+import axios, { AxiosError } from 'axios';
 
 const FormCadastroPaciente: React.FC = () => {
   const [codigoProntuario, setCodigoProntuario] = useState<string>('');
@@ -12,9 +12,20 @@ const FormCadastroPaciente: React.FC = () => {
   const [mensagem, setMensagem] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
 
+  // Validação básica do CPF
+  const validarCPF = (cpf: string) => {
+    return /^\d{11}$/.test(cpf); // Verifica se o CPF tem exatamente 11 dígitos numéricos
+  };
+
   const handleCadastrar = async () => {
-    setMensagem(null); // Resetando mensagem
-    setLoading(true); // Indicando que a requisição está em andamento
+    setMensagem(null);
+    setLoading(true);
+
+    if (!validarCPF(cpf)) {
+      setMensagem('CPF inválido. Insira um CPF com 11 dígitos numéricos.');
+      setLoading(false);
+      return;
+    }
 
     const novoPaciente = {
       codigoProntuario,
@@ -23,24 +34,30 @@ const FormCadastroPaciente: React.FC = () => {
       sexo,
       cpf,
       nomeMae,
-      nomePai,
+      nomePai: nomePai || null, // Permite campo opcional
     };
 
     try {
-      // Fazendo a requisição POST para a API
       const response = await axios.post('http://localhost:3000/patients', novoPaciente);
 
-      // Verificando se a resposta foi bem-sucedida
-      if (response.status === 200) {
+      if (response.status === 201) { // Alterado para o status 201 (Created)
         setMensagem('Paciente cadastrado com sucesso!');
+        // Limpar o formulário após cadastro
+        setCodigoProntuario('');
+        setNome('');
+        setDataNascimento('');
+        setSexo('');
+        setCpf('');
+        setNomeMae('');
+        setNomePai('');
       } else {
         setMensagem('Ocorreu um erro ao cadastrar o paciente.');
       }
     } catch (error) {
-      console.error('Erro ao cadastrar paciente:', error);
-      setMensagem('Erro ao conectar com a API. Tente novamente mais tarde.');
+      const axiosError = error as AxiosError<{ message: string }>;
+      setMensagem(axiosError.response?.data?.message || 'Erro ao conectar com a API. Tente novamente mais tarde.');
     } finally {
-      setLoading(false); // Finalizando o estado de carregamento
+      setLoading(false);
     }
   };
 
@@ -83,11 +100,7 @@ const FormCadastroPaciente: React.FC = () => {
 
         <div className="form-group">
           <label>Sexo</label>
-          <select
-            value={sexo}
-            onChange={(e) => setSexo(e.target.value)}
-            required
-          >
+          <select value={sexo} onChange={(e) => setSexo(e.target.value)} required>
             <option value="">Selecione</option>
             <option value="masculino">Masculino</option>
             <option value="feminino">Feminino</option>
@@ -101,7 +114,8 @@ const FormCadastroPaciente: React.FC = () => {
             type="text"
             placeholder="Digite o CPF"
             value={cpf}
-            onChange={(e) => setCpf(e.target.value)}
+            onChange={(e) => setCpf(e.target.value.replace(/\D/g, ''))} // Permite apenas números
+            maxLength={11}
             required
           />
         </div>
@@ -127,10 +141,8 @@ const FormCadastroPaciente: React.FC = () => {
           />
         </div>
 
-        {/* Exibindo mensagem de erro ou sucesso */}
-        {mensagem && <p className="mensagem">{mensagem}</p>}
+        {mensagem && <p className={`mensagem ${loading ? 'loading' : ''}`}>{mensagem}</p>}
 
-        {/* Botão de cadastro */}
         <button onClick={handleCadastrar} disabled={loading}>
           {loading ? 'Cadastrando...' : 'Cadastrar'}
         </button>

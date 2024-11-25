@@ -9,25 +9,37 @@ const FormTransferencia: React.FC = () => {
   const [dataTransferencia, setDataTransferencia] = useState<string>('');
   const [horaTransferencia, setHoraTransferencia] = useState<string>('');
   const [mensagem, setMensagem] = useState<string | null>(null);
+  const [loading, setLoading] = useState<boolean>(false);
+
+  const formatarDataBr = (dataISO: string): string => {
+    const [ano, mes, dia] = dataISO.split('-');
+    return `${dia}/${mes}/${ano}`;
+  };
+
+  const formatarHoraBr = (horaISO: string): string => {
+    return horaISO.slice(0, 5); // Remove os segundos
+  };
 
   useEffect(() => {
     const now = new Date();
-    const date = now.toISOString().split('T')[0]; // Formato de data "YYYY-MM-DD"
-    const time = now.toTimeString().split(' ')[0]; // Formato de hora "HH:MM:SS"
+    const date = now.toISOString().split('T')[0]; // Formato ISO: AAAA-MM-DD
+    const time = now.toTimeString().split(' ')[0]; // Formato ISO: HH:MM:SS
 
-    setDataTransferencia(date);
-    setHoraTransferencia(time);
+    setDataTransferencia(formatarDataBr(date)); // Data formatada para DD/MM/AAAA
+    setHoraTransferencia(formatarHoraBr(time)); // Hora formatada para HH:MM
   }, []);
 
+  // Função para tratar a confirmação da transferência
   const handleTransferencia = async () => {
     setMensagem(null); // Resetando mensagens de erro/sucesso
+    setLoading(true);
 
     const payload = {
       cpf,
       codigoLeitoAtual,
       codigoUnidade,
       codigoLeitoDestino,
-      dataTransferencia,
+      dataTransferencia: dataTransferencia.split('/').reverse().join('-'), // Converte de DD/MM/AAAA para AAAA-MM-DD para envio à API
       horaTransferencia,
     };
 
@@ -41,13 +53,13 @@ const FormTransferencia: React.FC = () => {
       }
     } catch (error) {
       if (axios.isAxiosError(error)) {
-        // Erro gerado pelo Axios
         setMensagem(error.response?.data?.message || 'Erro ao fazer a transferência.');
       } else {
-        // Erro genérico que não é do Axios
         setMensagem('Erro ao conectar com o servidor.');
       }
       console.error('Erro na transferência:', error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -104,9 +116,8 @@ const FormTransferencia: React.FC = () => {
           <label>Data da Transferência</label>
           <input
             type="date"
-            value={dataTransferencia}
-            onChange={(e) => setDataTransferencia(e.target.value)}
-            readOnly
+            value={dataTransferencia.split('/').reverse().join('-')} // Converte para AAAA-MM-DD para input de tipo date
+            onChange={(e) => setDataTransferencia(formatarDataBr(e.target.value))}
           />
         </div>
 
@@ -115,14 +126,15 @@ const FormTransferencia: React.FC = () => {
           <input
             type="time"
             value={horaTransferencia}
-            onChange={(e) => setHoraTransferencia(e.target.value)}
-            readOnly
+            onChange={(e) => setHoraTransferencia(formatarHoraBr(e.target.value))}
           />
         </div>
 
         {mensagem && <p className="mensagem">{mensagem}</p>} {/* Exibe mensagens */}
 
-        <button onClick={handleTransferencia}>Confirmar Transferência</button>
+        <button onClick={handleTransferencia} disabled={loading}>
+          {loading ? 'Confirmando...' : 'Confirmar Transferência'}
+        </button>
       </div>
     </div>
   );

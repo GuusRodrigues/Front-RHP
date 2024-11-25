@@ -10,34 +10,40 @@ const FormAlta: React.FC = () => {
   const [mensagem, setMensagem] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
 
-  // Definindo data e hora da alta ao carregar a tela
+  const formatarDataBr = (dataISO: string): string => {
+    const [ano, mes, dia] = dataISO.split('-');
+    return `${dia}/${mes}/${ano}`;
+  };
+
+  const formatarHoraBr = (horaISO: string): string => {
+    return horaISO.slice(0, 5); // Remove os segundos
+  };
+
   useEffect(() => {
     const now = new Date();
-    const date = now.toISOString().split('T')[0]; // Formato de data "YYYY-MM-DD"
-    const time = now.toTimeString().split(' ')[0]; // Formato de hora "HH:MM:SS"
+    const date = now.toISOString().split('T')[0]; // Formato ISO: AAAA-MM-DD
+    const time = now.toTimeString().split(' ')[0]; // Formato ISO: HH:MM:SS
 
-    setDataAlta(date);
-    setHoraAlta(time);
+    setDataAlta(formatarDataBr(date)); // Data formatada para DD/MM/AAAA
+    setHoraAlta(formatarHoraBr(time)); // Hora formatada para HH:MM
   }, []);
 
   // Função para tratar a confirmação da alta
   const handleAlta = async () => {
-    setMensagem(null); // Resetando a mensagem
-    setLoading(true); // Iniciando o estado de loading
+    setMensagem(null);
+    setLoading(true);
 
     const altaData = {
       cpf,
-      dataAlta,
+      dataAlta: dataAlta.split('/').reverse().join('-'), // Converte de DD/MM/AAAA para AAAA-MM-DD para envio à API
       horaAlta,
       motivoAlta,
-      motivoOutro: motivoAlta === 'outros' ? motivoOutro : '', // Só enviar motivoOutro se 'outros' for selecionado
+      motivoOutro: motivoAlta === 'outros' ? motivoOutro : '',
     };
 
     try {
-      // Fazendo a requisição POST para a API
       const response = await axios.patch(`http://localhost:3000/patients/${cpf}/alta`, altaData);
 
-      // Verificando a resposta
       if (response.status === 200) {
         setMensagem('Alta confirmada com sucesso!');
       } else {
@@ -47,7 +53,7 @@ const FormAlta: React.FC = () => {
       console.error('Erro ao confirmar alta:', error);
       setMensagem('Erro ao conectar com a API. Tente novamente mais tarde.');
     } finally {
-      setLoading(false); // Finalizando o estado de loading
+      setLoading(false);
     }
   };
 
@@ -71,9 +77,8 @@ const FormAlta: React.FC = () => {
           <label>Data da Alta</label>
           <input
             type="date"
-            value={dataAlta}
-            onChange={(e) => setDataAlta(e.target.value)}
-            readOnly
+            value={dataAlta.split('/').reverse().join('-')} // Converte para AAAA-MM-DD para input de tipo date
+            onChange={(e) => setDataAlta(formatarDataBr(e.target.value))}
           />
         </div>
 
@@ -82,8 +87,7 @@ const FormAlta: React.FC = () => {
           <input
             type="time"
             value={horaAlta}
-            onChange={(e) => setHoraAlta(e.target.value)}
-            readOnly
+            onChange={(e) => setHoraAlta(formatarHoraBr(e.target.value))}
           />
         </div>
 
@@ -117,10 +121,8 @@ const FormAlta: React.FC = () => {
           </div>
         )}
 
-        {/* Exibindo a mensagem de erro ou sucesso */}
         {mensagem && <p className="mensagem">{mensagem}</p>}
 
-        {/* Botão para confirmar alta */}
         <button onClick={handleAlta} disabled={loading}>
           {loading ? 'Confirmando...' : 'Confirmar Alta'}
         </button>

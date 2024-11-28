@@ -31,7 +31,7 @@ const FormAlta: React.FC = () => {
   const handleAlta = async () => {
     setMensagem(null);
     setLoading(true);
-
+  
     const altaData = {
       cpf,
       dataAlta: dataAlta.split('/').reverse().join('-'), 
@@ -39,10 +39,16 @@ const FormAlta: React.FC = () => {
       motivoAlta,
       motivoOutro: motivoAlta === 'outros' ? motivoOutro : '',
     };
-
+  
     try {
       const response = await axios.patch(`http://localhost:3000/patients/${cpf}/alta`, altaData);
-
+  
+      // Verificação para garantir que a resposta não seja nula ou inválida
+      if (!response || !response.data) {
+        setMensagem('Resposta inválida do servidor. Tente novamente.');
+        return;
+      }
+  
       if (response.status === 200) {
         setMensagem('Alta confirmada com sucesso!');
       } else {
@@ -50,6 +56,8 @@ const FormAlta: React.FC = () => {
       }
     } catch (error) {
       const axiosError = error as AxiosError;
+  
+      // Tratamento específico para respostas com status conhecido
       if (axiosError.response?.status === 404) {
         setMensagem('CPF não encontrado. Verifique e tente novamente.');
       } else {
@@ -58,7 +66,7 @@ const FormAlta: React.FC = () => {
     } finally {
       setLoading(false);
     }
-  };
+  };  
 
   return (
     <div className="main-content">

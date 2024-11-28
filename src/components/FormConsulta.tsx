@@ -37,11 +37,12 @@ const FormConsulta: React.FC = () => {
     try {
       const response = await axios.get(`http://localhost:3000/patients/${cpf}`);
 
-      if (response.status === 200) {
+      // Verifica se a resposta é nula ou não possui dados esperados
+      if (response.status === 200 && response.data) {
         setDadosPaciente(response.data);
         setMensagem('Consulta realizada com sucesso!');
       } else {
-        setMensagem('Não foi possível realizar a consulta.');
+        setMensagem('Não foi possível realizar a consulta. Resposta inválida.');
       }
     } catch (error) {
       const axiosError = error as AxiosError<ErroResposta>;

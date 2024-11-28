@@ -1,5 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import axios, { AxiosError } from 'axios';
+
+interface ErroResposta {
+  message: string;
+}
 
 const FormTransferencia: React.FC = () => {
   const [cpf, setCpf] = useState<string>('');
@@ -45,22 +49,22 @@ const FormTransferencia: React.FC = () => {
     try {
       const response = await axios.post('/api/transferencia', payload);
 
-      if (response.status === 200) {
+      // Verifica se a resposta é nula ou não possui dados esperados
+      if (response.status === 200 && response.data) {
         setMensagem('Transferência realizada com sucesso!');
       } else {
-        setMensagem('Ocorreu um problema ao realizar a transferência.');
+        setMensagem('Não foi possível realizar a transferência. Resposta inválida.');
       }
     } catch (error) {
-      if (axios.isAxiosError(error)) {
-        if (error.response?.status === 404) {
-          setMensagem('CPF do paciente não encontrado. Verifique o número informado.');
-        } else if (error.response?.data?.message) {
-          setMensagem(error.response.data.message);
-        } else {
-          setMensagem('Erro ao realizar a transferência. Tente novamente mais tarde.');
-        }
+      const axiosError = error as AxiosError<ErroResposta>;
+
+      // Verificação para erros específicos da API
+      if (axiosError.response?.status === 404) {
+        setMensagem('CPF do paciente não encontrado. Verifique o número informado.');
+      } else if (axiosError.response?.data?.message) {
+        setMensagem(axiosError.response.data.message);
       } else {
-        setMensagem('Erro ao conectar com o servidor.');
+        setMensagem('Erro ao realizar a transferência. Tente novamente mais tarde.');
       }
       console.error('Erro na transferência:', error);
     } finally {

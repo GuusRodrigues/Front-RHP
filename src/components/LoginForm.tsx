@@ -20,23 +20,29 @@ const LoginForm: React.FC = () => {
         password,
       });
 
-      if (response.status === 200) {
+      // Verificação de resposta válida
+      if (response.status === 200 && response.data) {
         alert(`Login bem-sucedido! Token: ${response.data.token}`);
         console.log("Login bem-sucedido:", response.data);
 
         router.push('/SistemaContigencia');
+      } else {
+        setError('Resposta inválida recebida do servidor.');
       }
     } catch (err) {
       const error = err as AxiosError;
 
       if (error.response) {
+        // Caso o erro seja relacionado à resposta da API
         if (error.response.status === 404) {
-          setError('CPF do paciente não encontrado.');
+          setError('Usuário não encontrado.');
         } else {
           setError((error.response.data as { message?: string })?.message || 'Erro ao fazer login.');
         }
-      } else {
+      } else if (error.request) {
         setError('Não foi possível conectar ao servidor. Tente novamente mais tarde.');
+      } else {
+        setError('Erro inesperado. Tente novamente.');
       }
       console.error("Erro no login:", error);
     }

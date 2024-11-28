@@ -20,10 +20,13 @@ const FormCadastroPaciente: React.FC = () => {
   // Função para verificar se o CPF já existe
   const verificarCPFExistente = async (): Promise<boolean> => {
     try {
-      await axios.get(`http://localhost:3000/patients/${cpf}`);
-      // CPF encontrado
-      setMensagem('Este CPF já está cadastrado.');
-      return true;
+      const response = await axios.get(`http://localhost:3000/patients/${cpf}`);
+      if (response?.data) {
+        // CPF encontrado
+        setMensagem('Este CPF já está cadastrado.');
+        return true;
+      }
+      return false;
     } catch (error) {
       const axiosError = error as AxiosError;
       if (axiosError.response?.status === 404) {
@@ -31,7 +34,7 @@ const FormCadastroPaciente: React.FC = () => {
         return false;
       } else {
         setMensagem('Erro ao verificar CPF. Tente novamente.');
-        throw error;
+        return false; // Retorna falso para continuar o cadastro
       }
     }
   };
@@ -64,8 +67,9 @@ const FormCadastroPaciente: React.FC = () => {
       };
 
       const response = await axios.post('http://localhost:3000/patients', novoPaciente);
-
-      if (response.status === 201) {
+      
+      // Tratamento para garantir que a resposta seja válida
+      if (response?.status === 201 && response?.data) {
         setMensagem('Paciente cadastrado com sucesso!');
         setCodigoProntuario('');
         setNome('');
@@ -74,10 +78,17 @@ const FormCadastroPaciente: React.FC = () => {
         setCpf('');
         setNomeMae('');
         setNomePai('');
+      } else {
+        setMensagem('Falha no cadastro do paciente. Tente novamente.');
       }
     } catch (error) {
       const axiosError = error as AxiosError<{ message: string }>;
-      setMensagem(axiosError.response?.data?.message || 'Erro ao conectar com a API. Tente novamente mais tarde.');
+      // Tratamento para falhas na conexão ou resposta inesperada
+      if (axiosError.response?.data?.message) {
+        setMensagem(axiosError.response?.data?.message);
+      } else {
+        setMensagem('Erro ao conectar com a API. Tente novamente mais tarde.');
+      }
     } finally {
       setLoading(false);
     }

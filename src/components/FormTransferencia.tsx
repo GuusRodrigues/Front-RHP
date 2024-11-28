@@ -17,21 +17,20 @@ const FormTransferencia: React.FC = () => {
   };
 
   const formatarHoraBr = (horaISO: string): string => {
-    return horaISO.slice(0, 5); // Remove os segundos
+    return horaISO.slice(0, 5); 
   };
 
   useEffect(() => {
     const now = new Date();
-    const date = now.toISOString().split('T')[0]; // Formato ISO: AAAA-MM-DD
-    const time = now.toTimeString().split(' ')[0]; // Formato ISO: HH:MM:SS
+    const date = now.toISOString().split('T')[0]; 
+    const time = now.toTimeString().split(' ')[0]; 
 
-    setDataTransferencia(formatarDataBr(date)); // Data formatada para DD/MM/AAAA
-    setHoraTransferencia(formatarHoraBr(time)); // Hora formatada para HH:MM
+    setDataTransferencia(formatarDataBr(date)); 
+    setHoraTransferencia(formatarHoraBr(time)); 
   }, []);
 
-  // Função para tratar a confirmação da transferência
   const handleTransferencia = async () => {
-    setMensagem(null); // Resetando mensagens de erro/sucesso
+    setMensagem(null); 
     setLoading(true);
 
     const payload = {
@@ -53,7 +52,13 @@ const FormTransferencia: React.FC = () => {
       }
     } catch (error) {
       if (axios.isAxiosError(error)) {
-        setMensagem(error.response?.data?.message || 'Erro ao fazer a transferência.');
+        if (error.response?.status === 404) {
+          setMensagem('CPF do paciente não encontrado. Verifique o número informado.');
+        } else if (error.response?.data?.message) {
+          setMensagem(error.response.data.message);
+        } else {
+          setMensagem('Erro ao realizar a transferência. Tente novamente mais tarde.');
+        }
       } else {
         setMensagem('Erro ao conectar com o servidor.');
       }
@@ -116,7 +121,7 @@ const FormTransferencia: React.FC = () => {
           <label>Data da Transferência</label>
           <input
             type="date"
-            value={dataTransferencia.split('/').reverse().join('-')} // Converte para AAAA-MM-DD para input de tipo date
+            value={dataTransferencia.split('/').reverse().join('-')} 
             onChange={(e) => setDataTransferencia(formatarDataBr(e.target.value))}
           />
         </div>
@@ -130,7 +135,7 @@ const FormTransferencia: React.FC = () => {
           />
         </div>
 
-        {mensagem && <p className="mensagem">{mensagem}</p>} {/* Exibe mensagens */}
+        {mensagem && <p className="mensagem">{mensagem}</p>} 
 
         <button onClick={handleTransferencia} disabled={loading}>
           {loading ? 'Confirmando...' : 'Confirmar Transferência'}

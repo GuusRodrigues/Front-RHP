@@ -29,8 +29,12 @@ const LoginForm: React.FC = () => {
     } catch (err) {
       const error = err as AxiosError;
 
-      if (error.response && error.response.data) {
-        setError((error.response.data as { message?: string })?.message || 'Erro ao fazer login.');
+      if (error.response) {
+        if (error.response.status === 404) {
+          setError('CPF do paciente não encontrado.');
+        } else {
+          setError((error.response.data as { message?: string })?.message || 'Erro ao fazer login.');
+        }
       } else {
         setError('Não foi possível conectar ao servidor. Tente novamente mais tarde.');
       }
@@ -96,7 +100,6 @@ const LoginForm: React.FC = () => {
           <a href="#">Esqueci a senha</a>
         </div>
 
-        {/* Exibindo mensagem de erro de forma destacada */}
         {error && <div className="error-message">{error}</div>}
 
         <button type="submit" disabled={!username || !password}>

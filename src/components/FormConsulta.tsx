@@ -22,7 +22,7 @@ const FormConsulta: React.FC = () => {
   };
 
   const validarCPF = (cpf: string) => {
-    return /^\d{11}$/.test(cpf); 
+    return /^\d{11}$/.test(cpf); // CPF com exatamente 11 dígitos
   };
 
   const handleConsultar = async () => {
@@ -45,7 +45,15 @@ const FormConsulta: React.FC = () => {
       }
     } catch (error) {
       const axiosError = error as AxiosError<ErroResposta>;
-      setMensagem(axiosError.response?.data?.message || 'Erro ao consultar o CPF. Verifique a conexão ou o CPF informado.');
+
+      // Verificação específica para erro 404 (CPF não encontrado)
+      if (axiosError.response?.status === 404) {
+        setMensagem('CPF não encontrado. Verifique o número informado.');
+      } else if (axiosError.response?.data?.message) {
+        setMensagem(axiosError.response.data.message);
+      } else {
+        setMensagem('Erro ao consultar o CPF. Verifique a conexão ou o CPF informado.');
+      }
       console.error('Erro ao consultar CPF:', error);
     }
   };

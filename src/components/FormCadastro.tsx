@@ -17,6 +17,25 @@ const FormCadastroPaciente: React.FC = () => {
     return /^\d{11}$/.test(cpf); // Verifica se o CPF tem exatamente 11 dígitos numéricos
   };
 
+  // Função para verificar se o CPF já existe
+  const verificarCPFExistente = async (): Promise<boolean> => {
+    try {
+      await axios.get(`http://localhost:3000/patients/${cpf}`);
+      // CPF encontrado
+      setMensagem('Este CPF já está cadastrado.');
+      return true;
+    } catch (error) {
+      const axiosError = error as AxiosError;
+      if (axiosError.response?.status === 404) {
+        // CPF não encontrado, pode continuar
+        return false;
+      } else {
+        setMensagem('Erro ao verificar CPF. Tente novamente.');
+        throw error;
+      }
+    }
+  };
+
   const handleCadastrar = async () => {
     setMensagem(null);
     setLoading(true);
@@ -27,22 +46,27 @@ const FormCadastroPaciente: React.FC = () => {
       return;
     }
 
-    const novoPaciente = {
-      codigoProntuario,
-      name,
-      dob,
-      sexo,
-      cpf,
-      nomeMae,
-      nomePai: nomePai || null, // Permite campo opcional
-    };
-
     try {
+      const cpfExistente = await verificarCPFExistente();
+      if (cpfExistente) {
+        setLoading(false);
+        return;
+      }
+
+      const novoPaciente = {
+        codigoProntuario,
+        name,
+        dob,
+        sexo,
+        cpf,
+        nomeMae,
+        nomePai: nomePai || null,
+      };
+
       const response = await axios.post('http://localhost:3000/patients', novoPaciente);
 
-      if (response.status === 201) { // Alterado para o status 201 (Created)
+      if (response.status === 201) {
         setMensagem('Paciente cadastrado com sucesso!');
-        // Limpar o formulário após cadastro
         setCodigoProntuario('');
         setNome('');
         setDataNascimento('');
@@ -50,8 +74,6 @@ const FormCadastroPaciente: React.FC = () => {
         setCpf('');
         setNomeMae('');
         setNomePai('');
-      } else {
-        setMensagem('Ocorreu um erro ao cadastrar o paciente.');
       }
     } catch (error) {
       const axiosError = error as AxiosError<{ message: string }>;

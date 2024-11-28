@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import axios, { AxiosError } from 'axios';
 
 const FormAlta: React.FC = () => {
   const [cpf, setCpf] = useState<string>('');
@@ -16,26 +16,25 @@ const FormAlta: React.FC = () => {
   };
 
   const formatarHoraBr = (horaISO: string): string => {
-    return horaISO.slice(0, 5); // Remove os segundos
+    return horaISO.slice(0, 5); 
   };
 
   useEffect(() => {
     const now = new Date();
-    const date = now.toISOString().split('T')[0]; // Formato ISO: AAAA-MM-DD
-    const time = now.toTimeString().split(' ')[0]; // Formato ISO: HH:MM:SS
+    const date = now.toISOString().split('T')[0]; 
+    const time = now.toTimeString().split(' ')[0]; 
 
-    setDataAlta(formatarDataBr(date)); // Data formatada para DD/MM/AAAA
-    setHoraAlta(formatarHoraBr(time)); // Hora formatada para HH:MM
+    setDataAlta(formatarDataBr(date)); 
+    setHoraAlta(formatarHoraBr(time));
   }, []);
 
-  // Função para tratar a confirmação da alta
   const handleAlta = async () => {
     setMensagem(null);
     setLoading(true);
 
     const altaData = {
       cpf,
-      dataAlta: dataAlta.split('/').reverse().join('-'), // Converte de DD/MM/AAAA para AAAA-MM-DD para envio à API
+      dataAlta: dataAlta.split('/').reverse().join('-'), 
       horaAlta,
       motivoAlta,
       motivoOutro: motivoAlta === 'outros' ? motivoOutro : '',
@@ -50,8 +49,12 @@ const FormAlta: React.FC = () => {
         setMensagem('Ocorreu um erro ao confirmar a alta.');
       }
     } catch (error) {
-      console.error('Erro ao confirmar alta:', error);
-      setMensagem('Erro ao conectar com a API. Tente novamente mais tarde.');
+      const axiosError = error as AxiosError;
+      if (axiosError.response?.status === 404) {
+        setMensagem('CPF não encontrado. Verifique e tente novamente.');
+      } else {
+        setMensagem('Erro ao conectar com a API. Tente novamente mais tarde.');
+      }
     } finally {
       setLoading(false);
     }
@@ -68,7 +71,8 @@ const FormAlta: React.FC = () => {
             type="text"
             placeholder="Digite o CPF do paciente"
             value={cpf}
-            onChange={(e) => setCpf(e.target.value)}
+            onChange={(e) => setCpf(e.target.value.replace(/\D/g, ''))} 
+            maxLength={11}
             required
           />
         </div>
@@ -77,7 +81,7 @@ const FormAlta: React.FC = () => {
           <label>Data da Alta</label>
           <input
             type="date"
-            value={dataAlta.split('/').reverse().join('-')} // Converte para AAAA-MM-DD para input de tipo date
+            value={dataAlta.split('/').reverse().join('-')} 
             onChange={(e) => setDataAlta(formatarDataBr(e.target.value))}
           />
         </div>

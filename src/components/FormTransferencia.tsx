@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import axios, { AxiosError } from 'axios';
 
 interface ErroResposta {
@@ -7,58 +7,37 @@ interface ErroResposta {
 
 const FormTransferencia: React.FC = () => {
   const [cpf, setCpf] = useState<string>('');
-  const [codigoLeitoAtual, setCodigoLeitoAtual] = useState<string>('');
-  const [codigoUnidade, setCodigoUnidade] = useState<string>('');
+  const [codigoLeitoOrigem, setCodigoLeitoOrigem] = useState<string>('');
   const [codigoLeitoDestino, setCodigoLeitoDestino] = useState<string>('');
-  const [dataTransferencia, setDataTransferencia] = useState<string>('');
-  const [horaTransferencia, setHoraTransferencia] = useState<string>('');
+  const [dataHoraTransferencia, setDataHoraTransferencia] = useState<string>('');
   const [mensagem, setMensagem] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
 
-  const formatarDataBr = (dataISO: string): string => {
-    const [ano, mes, dia] = dataISO.split('-');
-    return `${dia}/${mes}/${ano}`;
-  };
-
-  const formatarHoraBr = (horaISO: string): string => {
-    return horaISO.slice(0, 5); 
-  };
-
-  useEffect(() => {
-    const now = new Date();
-    const date = now.toISOString().split('T')[0]; 
-    const time = now.toTimeString().split(' ')[0]; 
-
-    setDataTransferencia(formatarDataBr(date)); 
-    setHoraTransferencia(formatarHoraBr(time)); 
-  }, []);
-
   const handleTransferencia = async () => {
-    setMensagem(null); 
+    setMensagem(null);
     setLoading(true);
 
     const payload = {
       cpf,
-      codigoLeitoAtual,
-      codigoUnidade,
-      codigoLeitoDestino,
-      dataTransferencia: dataTransferencia.split('/').reverse().join('-'), // Converte de DD/MM/AAAA para AAAA-MM-DD para envio à API
-      horaTransferencia,
+      codigo_leito_origem: codigoLeitoOrigem,
+      codigo_leito_destino: codigoLeitoDestino,
+      datahora_transferencia: dataHoraTransferencia, // Campo único com data e hora
     };
 
     try {
       const response = await axios.post('/api/transferencia', payload);
 
-      // Verifica se a resposta é nula ou não possui dados esperados
       if (response.status === 200 && response.data) {
         setMensagem('Transferência realizada com sucesso!');
+        setCpf('');
+        setCodigoLeitoOrigem('');
+        setCodigoLeitoDestino('');
+        setDataHoraTransferencia('');
       } else {
         setMensagem('Não foi possível realizar a transferência. Resposta inválida.');
       }
     } catch (error) {
       const axiosError = error as AxiosError<ErroResposta>;
-
-      // Verificação para erros específicos da API
       if (axiosError.response?.status === 404) {
         setMensagem('CPF do paciente não encontrado. Verifique o número informado.');
       } else if (axiosError.response?.data?.message) {
@@ -83,38 +62,27 @@ const FormTransferencia: React.FC = () => {
             type="text"
             placeholder="Digite o CPF do paciente"
             value={cpf}
-            onChange={(e) => setCpf(e.target.value)}
+            onChange={(e) => setCpf(e.target.value.replace(/\D/g, ''))} // Apenas números
             required
           />
         </div>
 
         <div className="form-group">
-          <label>Código do Leito Atual</label>
+          <label>Código do Leito de Origem</label>
           <input
             type="text"
-            placeholder="Digite o código do leito atual"
-            value={codigoLeitoAtual}
-            onChange={(e) => setCodigoLeitoAtual(e.target.value)}
+            placeholder="Digite o código do leito de origem"
+            value={codigoLeitoOrigem}
+            onChange={(e) => setCodigoLeitoOrigem(e.target.value)}
             required
           />
         </div>
 
         <div className="form-group">
-          <label>Código da Unidade</label>
+          <label>Código do Leito de Destino</label>
           <input
             type="text"
-            placeholder="Digite o código da unidade"
-            value={codigoUnidade}
-            onChange={(e) => setCodigoUnidade(e.target.value)}
-            required
-          />
-        </div>
-
-        <div className="form-group">
-          <label>Código do Leito Destino</label>
-          <input
-            type="text"
-            placeholder="Digite o código do leito destino"
+            placeholder="Digite o código do leito de destino"
             value={codigoLeitoDestino}
             onChange={(e) => setCodigoLeitoDestino(e.target.value)}
             required
@@ -122,24 +90,16 @@ const FormTransferencia: React.FC = () => {
         </div>
 
         <div className="form-group">
-          <label>Data da Transferência</label>
+          <label>Data e Hora da Transferência</label>
           <input
-            type="date"
-            value={dataTransferencia.split('/').reverse().join('-')} 
-            onChange={(e) => setDataTransferencia(formatarDataBr(e.target.value))}
+            type="datetime-local"
+            value={dataHoraTransferencia}
+            onChange={(e) => setDataHoraTransferencia(e.target.value)}
+            required
           />
         </div>
 
-        <div className="form-group">
-          <label>Hora da Transferência</label>
-          <input
-            type="time"
-            value={horaTransferencia}
-            onChange={(e) => setHoraTransferencia(formatarHoraBr(e.target.value))}
-          />
-        </div>
-
-        {mensagem && <p className="mensagem">{mensagem}</p>} 
+        {mensagem && <p className="mensagem">{mensagem}</p>}
 
         <button onClick={handleTransferencia} disabled={loading}>
           {loading ? 'Confirmando...' : 'Confirmar Transferência'}

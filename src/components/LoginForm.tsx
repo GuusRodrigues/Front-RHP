@@ -1,6 +1,5 @@
 import { useState, ChangeEvent, FormEvent } from 'react';
 import { useRouter } from 'next/router';
-import axios, { AxiosError } from 'axios';
 import { FaUser, FaLock } from "react-icons/fa";
 import Image from 'next/image';
 
@@ -10,41 +9,33 @@ const LoginForm: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
 
+  // Simulação de resposta do servidor
+  const fakeLogin = (username: string, password: string) => {
+    return new Promise<{ token: string }>((resolve, reject) => {
+      setTimeout(() => {
+        if (username === "admin" && password === "1234") {
+          resolve({ token: "fake-token-123" });
+        } else {
+          reject(new Error("Usuário ou senha inválidos."));
+        }
+      }, 1000); // Simula atraso do servidor
+    });
+  };
+
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
-    setError(null); 
+    setError(null);
 
     try {
-      const response = await axios.post('http://localhost:3000/login', {
-        username,
-        password,
-      });
+      const response = await fakeLogin(username, password);
 
-      // Verificação de resposta válida
-      if (response.status === 200 && response.data) {
-        alert(`Login bem-sucedido! Token: ${response.data.token}`);
-        console.log("Login bem-sucedido:", response.data);
+      alert(`Login bem-sucedido! Token: ${response.token}`);
+      console.log("Login bem-sucedido:", response);
 
-        router.push('/SistemaContigencia');
-      } else {
-        setError('Resposta inválida recebida do servidor.');
-      }
+      router.push('/SistemaContigencia');
     } catch (err) {
-      const error = err as AxiosError;
-
-      if (error.response) {
-        // Caso o erro seja relacionado à resposta da API
-        if (error.response.status === 404) {
-          setError('Usuário não encontrado.');
-        } else {
-          setError((error.response.data as { message?: string })?.message || 'Erro ao fazer login.');
-        }
-      } else if (error.request) {
-        setError('Não foi possível conectar ao servidor. Tente novamente mais tarde.');
-      } else {
-        setError('Erro inesperado. Tente novamente.');
-      }
-      console.error("Erro no login:", error);
+      setError(err instanceof Error ? err.message : 'Erro inesperado.');
+      console.error("Erro no login:", err);
     }
   };
 

@@ -12,117 +12,129 @@
 
 /*NavBAr*/
 .header {
-    background-color: #ffffff; 
-    color: rgb(0, 0, 0);
-    width: 100%;
-    padding: 15px;
-    margin-top: -10px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    
-  }
+  background-color: #ffffff; 
+  color: rgb(0, 0, 0);
+  width: 100%;
+  padding: 15px;
+  margin-top: -10px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  z-index: 1;
+}
    
 /*LoginForm*/
 .container {
-    width: 100%;
-    max-width: 350px;
-    padding: 40px;
-    background-color: white;
-    border-radius: 20px;
-    box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.15);
-    text-align: center;
-    margin: 30px;
-    margin-top: 30px;   
+  width: 100%;
+  max-width: 350px;
+  padding: 20px;
+  background-color: white;
+  border-radius: 20px;
+  box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.15);
+  text-align: center;
+  margin: auto;
+  margin-top: 20px;   
 }
 
 .LogoForm {
-    justify-content: center;
-    align-items: center;
-    margin-bottom: 10px;
-    margin-top: -10px;
-    
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 10px;
+  margin-top: -10px;
 }
 
 .input-group {
-    margin-bottom: 10px;
-    text-align: left;
+  margin-bottom: 10px;
+  text-align: left;
 }
 
 .input-group p {
     margin-bottom: 5px;
     margin-left: 7px;
-    font-size: 15px;
+    font-size: 14px;
     color: #2d7c59;
 }
 
 .input-with-icon {
-    display: flex;
-    align-items: center;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    padding: 10px;
-    background-color: #f9f9f9;
+  display: flex;
+  align-items: center;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  padding: 8px;
+  background-color: #f9f9f9;
 }
 
 .input-with-icon input {
-    border: none;
-    outline: none;
-    flex: 1;
-    background-color: transparent;
+  border: none;
+  outline: none;
+  flex: 1;
+  background-color: transparent;
 }
 
 .icon {
-    margin-right: 10px;
-    font-size: 15px;
-    color: #2d7c59;
+  margin-right: 10px;
+  font-size: 15px;
+  color: #2d7c59;
 }
 
 .remember-me {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    font-size: 0.9em;
-    color: #555;
-    margin-bottom: 30px;
-    margin-top: -5px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.9em;
+  color: #555;
+  margin-bottom: 30px;
+  margin-top: -5px;
 }
 
 button[type="submit"] {
-    width: 100%;
-    padding: 10px;
-    background-color: #006035;
-    color: white;
-    border: none;
-    border-radius: 4px;
-    font-size: 1em;
-    cursor: pointer;
-    transition: background-color 0.3s;
+  width: 100%;
+  padding: 10px;
+  background-color: #006035;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-size: 1em;
+  cursor: pointer;
+  transition: background-color 0.3s;
 }
 
 button[type="submit"]:hover {
-    background-color: #01aa5e;
+  background-color: #01aa5e;
 }
 
 /*SisContigencia*/
 .main-content {
-  margin-top: -30px;
-  margin-left: -50px;
-  flex: 1;
   display: flex;
   justify-content: center;
   align-items: center;
-  padding: 5px;
+  flex: 1;
+  height: 100vh;
+  padding: 20px;
   background-color: transparent;
+  margin: 0;
+}
+
+html, body {
+  height: 100%; /* Garante que o corpo ocupe toda a altura da janela */
+  margin: 0; /* Remove qualquer margem */
+  padding: 0; /* Remove qualquer padding */
+  overflow: hidden; /* Esconde o scroll */
 }
 
 .form-card {
   background-color: #F5F5F5;
-  width: 550px;
+  width: 100%;
+  max-width: 550px;
   text-align: center;
   border-radius: 10px;
   box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.15);
-
+  padding: 20px;
+  position: absolute; 
+  top: 48%; 
+  left: 50%; 
+  transform: translate(-50%, -50%);
 }
 
 .form-card h3 {
@@ -131,8 +143,6 @@ button[type="submit"]:hover {
   padding: px;
   border-radius: 8px 8px 0 0;
   margin-top: 0px;
- 
-
 }
 
 .form-group {
@@ -175,57 +185,87 @@ button:hover {
 }
 
 .AjusteSideBar {
-  display: flex; 
-  flex-direction: row; 
+  display: flex;
+  flex-direction: row;
+  height: 100vh;  /* Garante que a barra lateral ocupe toda a altura da tela */
 }
 
+/* Sidebar container */
 .sidebar {
-    width: 270px;
-    background-color: #014e2b;
-    box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.25);
-    color: #fff;
-    padding: 20px;
-    display: flex;
-    flex-direction: column;
-    height: 100vh;
-    margin-top: -5px;
-     
-  }
-  
-  .sidebar-section {
-    background-color: #ffffff; 
-    color: #004d00; 
-    padding: 15px;
-    border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-    margin-bottom: 15px;
-  }
-  
-  .sidebar-section:first-child {
-    flex-grow: 1; 
-  }
-  
-  .sidebar-section h3 {
-    margin-bottom: 20px;
-    font-size: 20px;
-    color: black;
-    margin-left: 10px;
-    font-weight: bold;
+  width: 270px; 
+  background-color: #014e2b;  
+  box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.25);  
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  height: 100vh;  /* Preenche a altura total da janela */
+  position: fixed;  /* Mantém o sidebar fixo ao lado */
+  top: 0;
+  left: 0;
+  z-index: 10; 
+}
 
+.sidebar-section {
+  background-color: #ffffff; 
+  color: #004d00; 
+  padding: 15px;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  margin-bottom: 15px;
+}
+
+.sidebar-section h3 {
+  margin-bottom: 20px;
+  font-size: 20px;
+  color: black;
+  margin-left: 10px;
+  font-weight: bold;
+}
+
+.sidebar-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.sidebar-item {
+  cursor: pointer;
+  padding: 10px;
+  border-radius: 4px;
+  transition: background-color 0.3s;
+}
+
+.sidebar-item:hover {
+  background-color: #b2b3b4;
+}
+
+.sidebar-item:active {
+  background-color: #1abc9c;
+}
+
+.sidebar-item.logout {
+  color: #e74c3c;  
+}
+
+.sidebar-item.logout:hover {
+  background-color: #d88e85;
+}
+
+.main-content {
+  flex-grow: 1;  
+  padding: 20px;
+  margin-left: 270px;  
+}
+
+
+@media (min-width: 768px) {
+  .container {
+    max-width: 400px;
+    padding: 40px; /* Retoma o padding maior para telas maiores */
   }
-  
-  .sidebar-section ul {
-    list-style: none;
-    padding: 0;
+
+  button[type="submit"] {
+    padding: 10px; /* Reajusta padding para botões */
+    font-size: 1em; /* Tamanho maior de fonte para desktop */
   }
-  
-  .sidebar-section ul li {
-    margin: 10px 0;
-    cursor: pointer;
-  }
-  
-  .sidebar-section ul li:hover {
-    text-decoration: underline;
-  }
-  
-  
+}

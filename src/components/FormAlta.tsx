@@ -34,17 +34,8 @@ const FormAlta: React.FC = () => {
     setHoraAlta(time.slice(0, 5));
   }, []);
 
-  const validarCPF = (cpf: string): boolean => {
-    return cpf.length === 11 && /^[0-9]{11}$/.test(cpf);
-  };
-
   const handleAlta = async () => {
     setMensagem(null);
-
-    if (!validarCPF(cpf)) {
-      setMensagem('CPF inválido. Por favor, insira um CPF válido com 11 dígitos.');
-      return;
-    }
 
     if (!dataAlta || !horaAlta) {
       setMensagem('Data e hora da alta são obrigatórias.');
@@ -100,7 +91,7 @@ const FormAlta: React.FC = () => {
           <label>CPF do Paciente</label>
           <input
             type="text"
-            placeholder="Digite o CPF do paciente (somente números)"
+            placeholder="Digite o CPF do paciente"
             value={cpf}
             onChange={(e) => setCpf(formatCPF(e.target.value))} 
             maxLength={14}

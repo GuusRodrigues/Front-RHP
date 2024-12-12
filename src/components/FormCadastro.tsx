@@ -29,28 +29,6 @@ const FormCadastroPaciente: React.FC = () => {
     return /^\d{5}-\d{3}$/.test(cep); // Verifica se o CEP está no formato 00000-000
   };
 
-  // Função para verificar se o CPF já existe
-  const verificarCPFExistente = async (): Promise<boolean> => {
-    try {
-      const response = await axios.get(`http://localhost:3000/patients/${cpf}`);
-      if (response?.data) {
-        // CPF encontrado
-        setMensagem('Este CPF já está cadastrado.');
-        return true;
-      }
-      return false;
-    } catch (error) {
-      const axiosError = error as AxiosError;
-      if (axiosError.response?.status === 404) {
-        // CPF não encontrado, pode continuar
-        return false;
-      } else {
-        setMensagem('Erro ao verificar CPF. Tente novamente.');
-        return false; // Retorna falso para continuar o cadastro
-      }
-    }
-  };
-
   const handleCadastrar = async () => {
     setMensagem(null);
     setLoading(true);
@@ -58,12 +36,6 @@ const FormCadastroPaciente: React.FC = () => {
     // Validação do CEP
     if (!validarCEP(cep)) {
       setMensagem('CEP inválido. Insira um CEP no formato 00000-000.');
-      setLoading(false);
-      return;
-    }
-
-    const cpfExistente = await verificarCPFExistente();
-    if (cpfExistente) {
       setLoading(false);
       return;
     }
@@ -97,10 +69,13 @@ const FormCadastroPaciente: React.FC = () => {
         // Deixe em branco ou log para debug
         console.log('Falha no cadastro, mas sem mensagem exibida.');
       }
+      
     } catch (error) {
-      const axiosError = error as AxiosError<{ message: string }>;
-      if (axiosError.response?.data?.message) {
-        setMensagem(axiosError.response?.data?.message);
+      const axiosError = error as AxiosError<{ detail: string }>;
+
+      // Exibe a mensagem de erro detalhada, caso haja um erro específico da API
+      if (axiosError.response?.data?.detail) {
+        setMensagem(axiosError.response.data.detail);
       } else {
         setMensagem('Erro ao conectar com a API. Tente novamente mais tarde.');
       }

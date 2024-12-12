@@ -1,6 +1,14 @@
 import React, { useState } from 'react';
 import axios, { AxiosError } from 'axios';
 
+const formatCPF = (value: string): string => {
+  const numericValue = value.replace(/\D/g, ''); // Remove caracteres não numéricos
+  return numericValue
+    .replace(/(\d{3})(\d)/, '$1.$2')
+    .replace(/(\d{3})(\d)/, '$1.$2')
+    .replace(/(\d{3})(\d{2})$/, '$1-$2');
+};
+
 interface ErroResposta {
   message: string;
 }
@@ -62,7 +70,8 @@ const FormTransferencia: React.FC = () => {
             type="text"
             placeholder="Digite o CPF do paciente"
             value={cpf}
-            onChange={(e) => setCpf(e.target.value.replace(/\D/g, ''))} // Apenas números
+            onChange={(e) => setCpf(formatCPF(e.target.value))} 
+            maxLength={14}           
             required
           />
         </div>

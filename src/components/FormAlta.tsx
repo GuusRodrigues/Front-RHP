@@ -1,6 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import axios, { AxiosError } from 'axios';
 
+
+const formatCPF = (value: string): string => {
+  const numericValue = value.replace(/\D/g, ''); // Remove caracteres não numéricos
+  return numericValue
+    .replace(/(\d{3})(\d)/, '$1.$2')
+    .replace(/(\d{3})(\d)/, '$1.$2')
+    .replace(/(\d{3})(\d{2})$/, '$1-$2');
+};
 const FormAlta: React.FC = () => {
   const [cpf, setCpf] = useState<string>('');
   const [dataAlta, setDataAlta] = useState<string>('');
@@ -79,8 +87,8 @@ const FormAlta: React.FC = () => {
             type="text"
             placeholder="Digite o CPF do paciente"
             value={cpf}
-            onChange={(e) => setCpf(e.target.value.replace(/\D/g, ''))} 
-            maxLength={11}
+            onChange={(e) => setCpf(formatCPF(e.target.value))} 
+            maxLength={14}
             required
           />
         </div>

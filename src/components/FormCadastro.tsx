@@ -1,6 +1,19 @@
 import React, { useState } from 'react';
 import axios, { AxiosError } from 'axios';
 
+const formatCPF = (value: string): string => {
+  const numericValue = value.replace(/\D/g, ''); // Remove caracteres não numéricos
+  return numericValue
+    .replace(/(\d{3})(\d)/, '$1.$2')
+    .replace(/(\d{3})(\d)/, '$1.$2')
+    .replace(/(\d{3})(\d{2})$/, '$1-$2');
+};
+
+const formatCEP = (value: string): string => {
+  const numericValue = value.replace(/\D/g, ''); // Remove caracteres não numéricos
+  return numericValue.replace(/(\d{5})(\d{3})$/, '$1-$2');
+};
+
 const FormCadastroPaciente: React.FC = () => {
   const [name, setNome] = useState<string>('');
   const [dob, setDataNascimento] = useState<string>('');
@@ -11,14 +24,9 @@ const FormCadastroPaciente: React.FC = () => {
   const [mensagem, setMensagem] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
 
-  // Validação básica do CPF
-  const validarCPF = (cpf: string) => {
-    return /^\d{11}$/.test(cpf); // Verifica se o CPF tem exatamente 11 dígitos numéricos
-  };
-
   // Validação do CEP
   const validarCEP = (cep: string) => {
-    return /^\d{8}$/.test(cep); // Verifica se o CEP tem exatamente 8 dígitos numéricos
+    return /^\d{5}-\d{3}$/.test(cep); // Verifica se o CEP está no formato 00000-000
   };
 
   // Função para verificar se o CPF já existe
@@ -47,25 +55,19 @@ const FormCadastroPaciente: React.FC = () => {
     setMensagem(null);
     setLoading(true);
 
-    if (!validarCPF(cpf)) {
-      setMensagem('CPF inválido. Insira um CPF com 11 dígitos numéricos.');
+    if (!validarCEP(cep)) {
+      setMensagem('CEP inválido. Insira um CEP no formato 00000-000.');
       setLoading(false);
       return;
     }
 
-    if (!validarCEP(cep)) {
-      setMensagem('CEP inválido. Insira um CEP com 8 dígitos numéricos.');
+    const cpfExistente = await verificarCPFExistente();
+    if (cpfExistente) {
       setLoading(false);
       return;
     }
 
     try {
-      const cpfExistente = await verificarCPFExistente();
-      if (cpfExistente) {
-        setLoading(false);
-        return;
-      }
-
       const novoPaciente = {
         name,
         dob,
@@ -76,8 +78,7 @@ const FormCadastroPaciente: React.FC = () => {
       };
 
       const response = await axios.post('http://localhost:3000/patients', novoPaciente);
-      
-      // Tratamento para garantir que a resposta seja válida
+
       if (response?.status === 201 && response?.data) {
         setMensagem('Paciente cadastrado com sucesso!');
         setNome('');
@@ -91,7 +92,6 @@ const FormCadastroPaciente: React.FC = () => {
       }
     } catch (error) {
       const axiosError = error as AxiosError<{ message: string }>;
-      // Tratamento para falhas na conexão ou resposta inesperada
       if (axiosError.response?.data?.message) {
         setMensagem(axiosError.response?.data?.message);
       } else {
@@ -134,8 +134,8 @@ const FormCadastroPaciente: React.FC = () => {
             type="text"
             placeholder="Digite o CPF"
             value={cpf}
-            onChange={(e) => setCpf(e.target.value.replace(/\D/g, ''))} // Permite apenas números
-            maxLength={11}
+            onChange={(e) => setCpf(formatCPF(e.target.value))} // Formata o CPF enquanto o usuário digita
+            maxLength={14} // Limita o tamanho ao formato do CPF
             required
           />
         </div>
@@ -157,8 +157,8 @@ const FormCadastroPaciente: React.FC = () => {
             type="text"
             placeholder="Digite o CEP do paciente"
             value={cep}
-            onChange={(e) => setCep(e.target.value.replace(/\D/g, ''))} // Permite apenas números
-            maxLength={8}
+            onChange={(e) => setCep(formatCEP(e.target.value))} // Formata o CEP enquanto o usuário digita
+            maxLength={9} // Limita o tamanho ao formato do CEP
             required
           />
         </div>

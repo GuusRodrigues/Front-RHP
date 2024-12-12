@@ -1,6 +1,14 @@
 import React, { useState } from 'react';
 import axios, { AxiosError } from 'axios';
 
+const formatCPF = (value: string): string => {
+  const numericValue = value.replace(/\D/g, ''); // Remove caracteres não numéricos
+  return numericValue
+    .replace(/(\d{3})(\d)/, '$1.$2')
+    .replace(/(\d{3})(\d)/, '$1.$2')
+    .replace(/(\d{3})(\d{2})$/, '$1-$2');
+};
+
 interface DadosPaciente {
   name: string;
   dob: string;
@@ -21,18 +29,9 @@ const FormConsulta: React.FC = () => {
     return `${dia}/${mes}/${ano}`;
   };
 
-  const validarCPF = (cpf: string) => {
-    return /^\d{11}$/.test(cpf); // CPF com exatamente 11 dígitos
-  };
-
   const handleConsultar = async () => {
     setMensagem(null);
     setDadosPaciente(null);
-
-    if (!validarCPF(cpf)) {
-      setMensagem('CPF inválido. Insira um CPF com 11 dígitos.');
-      return;
-    }
 
     try {
       const response = await axios.get(`http://localhost:3000/patients/${cpf}`);
@@ -71,8 +70,8 @@ const FormConsulta: React.FC = () => {
             type="text"
             placeholder="Digite o CPF aqui"
             value={cpf}
-            onChange={(e) => setCpf(e.target.value.replace(/\D/g, ''))} // Permite apenas números
-            maxLength={11}
+            onChange={(e) => setCpf(formatCPF(e.target.value))} 
+            maxLength={14}
           />
         </div>
         

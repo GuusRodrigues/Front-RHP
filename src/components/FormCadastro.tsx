@@ -55,6 +55,7 @@ const FormCadastroPaciente: React.FC = () => {
     setMensagem(null);
     setLoading(true);
 
+    // Validação do CEP
     if (!validarCEP(cep)) {
       setMensagem('CEP inválido. Insira um CEP no formato 00000-000.');
       setLoading(false);
@@ -69,18 +70,22 @@ const FormCadastroPaciente: React.FC = () => {
 
     try {
       const novoPaciente = {
-        name,
-        dob,
         cpf,
-        nomeMae,
+        nome: name,
+        data_nascimento: dob,
         endereco,
         cep,
+        nome_mae: nomeMae,
       };
 
-      const response = await axios.post('http://localhost:3000/patients', novoPaciente);
+      // Envia a requisição POST para o back-end
+      const response = await axios.post('http://127.0.0.1:8000/paciente/', novoPaciente);
 
-      if (response?.status === 201 && response?.data) {
+      // Verifica se a resposta é de sucesso
+      if (response.status === 201 && response.data) {
         setMensagem('Paciente cadastrado com sucesso!');
+        
+        // Limpa os campos após o cadastro
         setNome('');
         setDataNascimento('');
         setCpf('');
@@ -88,7 +93,9 @@ const FormCadastroPaciente: React.FC = () => {
         setCep('');
         setEndereco('');
       } else {
-        setMensagem('Falha no cadastro do paciente. Tente novamente.');
+        // Caso de falha, não exibe mais a mensagem de erro
+        // Deixe em branco ou log para debug
+        console.log('Falha no cadastro, mas sem mensagem exibida.');
       }
     } catch (error) {
       const axiosError = error as AxiosError<{ message: string }>;
@@ -98,6 +105,7 @@ const FormCadastroPaciente: React.FC = () => {
         setMensagem('Erro ao conectar com a API. Tente novamente mais tarde.');
       }
     } finally {
+      // Finaliza o processo de carregamento
       setLoading(false);
     }
   };
@@ -174,6 +182,7 @@ const FormCadastroPaciente: React.FC = () => {
           />
         </div>
 
+        {/* Exibe a mensagem de sucesso ou erro */}
         {mensagem && <p className={`mensagem ${loading ? 'loading' : ''}`}>{mensagem}</p>}
 
         <button onClick={handleCadastrar} disabled={loading}>

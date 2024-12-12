@@ -10,7 +10,7 @@ const formatCPF = (value: string): string => {
 };
 
 interface ErroResposta {
-  message: string;
+  detail: string; // Ajustado para refletir a estrutura de erro da sua API
 }
 
 const FormTransferencia: React.FC = () => {
@@ -27,15 +27,15 @@ const FormTransferencia: React.FC = () => {
 
     const payload = {
       cpf,
-      codigo_leito_origem: codigoLeitoOrigem,
-      codigo_leito_destino: codigoLeitoDestino,
+      codigo_leito_origem: parseInt(codigoLeitoOrigem, 10), // Convertendo para número
+      codigo_leito_destino: parseInt(codigoLeitoDestino, 10), // Convertendo para número
       datahora_transferencia: dataHoraTransferencia, // Campo único com data e hora
     };
 
     try {
-      const response = await axios.post('/api/transferencia', payload);
+      const response = await axios.post('http://127.0.0.1:8000/transferencia/', payload);
 
-      if (response.status === 200 && response.data) {
+      if (response.status === 200 || response.status === 201) {
         setMensagem('Transferência realizada com sucesso!');
         setCpf('');
         setCodigoLeitoOrigem('');
@@ -47,9 +47,9 @@ const FormTransferencia: React.FC = () => {
     } catch (error) {
       const axiosError = error as AxiosError<ErroResposta>;
       if (axiosError.response?.status === 404) {
-        setMensagem('CPF do paciente não encontrado. Verifique o número informado.');
-      } else if (axiosError.response?.data?.message) {
-        setMensagem(axiosError.response.data.message);
+        setMensagem('CPF do paciente ou leito não encontrado. Verifique os dados informados.');
+      } else if (axiosError.response?.data?.detail) {
+        setMensagem(axiosError.response.data.detail);
       } else {
         setMensagem('Erro ao realizar a transferência. Tente novamente mais tarde.');
       }

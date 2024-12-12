@@ -10,13 +10,16 @@ const formatCPF = (value: string): string => {
 };
 
 interface DadosPaciente {
-  name: string;
-  dob: string;
-  sexo: string;
+  cpf: string;
+  nome: string;
+  data_nascimento: string;
+  endereco?: string;
+  cep?: string;
+  nome_mae?: string;
 }
 
 interface ErroResposta {
-  message: string;
+  detail: string;
 }
 
 const FormConsulta: React.FC = () => {
@@ -34,9 +37,7 @@ const FormConsulta: React.FC = () => {
     setDadosPaciente(null);
 
     try {
-      const response = await axios.get(`http://localhost:3000/patients/${cpf}`);
-
-      // Verifica se a resposta é nula ou não possui dados esperados
+      const response = await axios.get(`http://127.0.0.1:8000/paciente/${cpf}`);
       if (response.status === 200 && response.data) {
         setDadosPaciente(response.data);
         setMensagem('Consulta realizada com sucesso!');
@@ -46,11 +47,10 @@ const FormConsulta: React.FC = () => {
     } catch (error) {
       const axiosError = error as AxiosError<ErroResposta>;
 
-      // Verificação específica para erro 404 (CPF não encontrado)
       if (axiosError.response?.status === 404) {
-        setMensagem('CPF não encontrado. Verifique o número informado.');
-      } else if (axiosError.response?.data?.message) {
-        setMensagem(axiosError.response.data.message);
+        setMensagem('Paciente não encontrado. Verifique o CPF informado.');
+      } else if (axiosError.response?.data?.detail) {
+        setMensagem(axiosError.response.data.detail);
       } else {
         setMensagem('Erro ao consultar o CPF. Verifique a conexão ou o CPF informado.');
       }
@@ -82,9 +82,12 @@ const FormConsulta: React.FC = () => {
         {dadosPaciente && (
           <div className="dados-paciente">
             <h4>Dados do Paciente:</h4>
-            <p><strong>Nome:</strong> {dadosPaciente.name}</p>
-            <p><strong>Data de Nascimento:</strong> {formatarDataBR(dadosPaciente.dob)}</p>
-            <p><strong>Sexo:</strong> {dadosPaciente.sexo}</p>
+            <p><strong>CPF:</strong> {dadosPaciente.cpf}</p>
+            <p><strong>Nome:</strong> {dadosPaciente.nome}</p>
+            <p><strong>Data de Nascimento:</strong> {formatarDataBR(dadosPaciente.data_nascimento)}</p>
+            {dadosPaciente.endereco && <p><strong>Endereço:</strong> {dadosPaciente.endereco}</p>}
+            {dadosPaciente.cep && <p><strong>CEP:</strong> {dadosPaciente.cep}</p>}
+            {dadosPaciente.nome_mae && <p><strong>Nome da Mãe:</strong> {dadosPaciente.nome_mae}</p>}
           </div>
         )}
       </div>
